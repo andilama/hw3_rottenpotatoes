@@ -15,7 +15,9 @@ end
 Then /I should see "(.*)" before "(.*)"/ do |e1, e2|
   #  ensure that that e1 occurs before e2.
   #  page.content  is the entire content of the page as a string.
-  flunk "Unimplemented"
+  e1_index = page.body.index(e1)
+  e2_index = page.body.index(e2)
+  assert e1_index < e2_index
 end
 
 # Make it easier to express checking or unchecking several boxes at once
@@ -32,7 +34,13 @@ When /I (un)?check the following ratings: (.*)/ do |uncheck, rating_list|
 end
 
 Then /I should see all movies/ do
-  debugger
-  rows = Movie.count()
-  puts rows
+  rows = 0
+  db_rows = Movie.count()
+  movies = Movie.find(:all)
+  movies.each do |movie|
+    if page.has_content?(movie[:title])
+      rows += 1
+    end
+  end
+  assert rows == db_rows
 end
